@@ -1,0 +1,26 @@
+{
+  "name": "excel-formula-engine-example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "generate:antlr": "cd ./src/antlr && antlr -Dlanguage=TypeScript -visitor Formula.g4 -o ./generated"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "antlr4": "^4.13.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.3.0",
+    "jest": "^30.0.5",
+    "ts-jest": "^29.4.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
