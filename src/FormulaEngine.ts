@@ -18,9 +18,9 @@ export function evaluate(formula: string, cellValues: Map<string, unknown>): unk
   const parser = new FormulaParser(tokenStream);
   const tree = parser.formula();
 
-  // ASTをRPNに変換
+  // Parse Tree をRPNに変換
   const converter = new FormulaToRPNConverter();
-  const rpnResult = converter.convert(tree);
+  const ir = converter.convert(tree);
 
   // 評価コンテキストを作成
   const context: EvaluationContext = {
@@ -29,7 +29,7 @@ export function evaluate(formula: string, cellValues: Map<string, unknown>): unk
 
   // StackVMで評価
   const vm = new StackVM();
-  const result = vm.evaluate(rpnResult.tokens, context);
+  const result = vm.evaluate(ir.tokens, context);
 
   return result;
 }

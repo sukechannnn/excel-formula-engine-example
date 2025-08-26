@@ -46,13 +46,6 @@ export interface RPNToken {
 export interface IntermediateRepresentation {
   tokens: RPNToken[];
   dependencies: string[];
-  originalFormula: string;
-}
-
-// コンパイル済み式
-export interface CompiledFormula {
-  ir: IntermediateRepresentation;
-  evaluate: (deps: Map<string, unknown>) => unknown;
 }
 
 // 評価コンテキスト

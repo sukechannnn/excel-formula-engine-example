@@ -1,7 +1,7 @@
-// ANTLR ASTから逆ポーランド記法（RPN）への変換
+// ANTLR で生成した Parse Tree から逆ポーランド記法（RPN）への変換
 
 import FormulaVisitor from "./antlr/generated/FormulaVisitor";
-import { TokenType, RPNToken } from "./types";
+import { TokenType, RPNToken, IntermediateRepresentation } from "./types";
 import type {
   FormulaContext,
   ExprContext,
@@ -20,7 +20,7 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
   private dependencies: Set<string> = new Set();
 
   // エントリーポイント
-  convert(ctx: FormulaContext): { tokens: RPNToken[]; dependencies: string[] } {
+  convert(ctx: FormulaContext): IntermediateRepresentation {
     this.tokens = [];
     this.dependencies = new Set();
 
@@ -40,7 +40,7 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
 
   visitExpr = (ctx: ExprContext): void => {
     const additiveExprs = ctx.additiveExpr_list();
-    
+
     if (additiveExprs.length === 1) {
       // 比較演算子なし
       this.visit(additiveExprs[0]);
@@ -48,7 +48,7 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
       // 比較演算子あり
       this.visit(additiveExprs[0]);
       this.visit(additiveExprs[1]);
-      
+
       if (ctx.GT()) {
         this.tokens.push({ type: TokenType.GREATER_THAN });
       } else if (ctx.LT()) {
@@ -165,7 +165,6 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
     }
   };
 
-
   visitCellRef = (ctx: CellRefContext): void => {
     const ref = ctx.getText();
 
@@ -217,18 +216,18 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
 
   visitSumFunction = (ctx: SumFunctionContext): void => {
     const exprs = ctx.expr_list();
-    
+
     if (exprs && exprs.length > 0) {
       // 各引数を評価
       for (const expr of exprs) {
         this.visit(expr);
       }
-      
+
       // SUM関数呼び出し（引数の数を記録）
-      this.tokens.push({ 
-        type: TokenType.FUNCTION_CALL, 
-        value: 'SUM',
-        argCount: exprs.length 
+      this.tokens.push({
+        type: TokenType.FUNCTION_CALL,
+        value: "SUM",
+        argCount: exprs.length,
       });
     } else {
       // 引数なしの場合は0を返す
