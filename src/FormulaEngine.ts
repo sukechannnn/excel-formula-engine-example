@@ -12,7 +12,6 @@ export function evaluate(formula: string, cellValues: Map<string, unknown>): unk
 
   // トークンストリームを作成
   const tokenStream = new CommonTokenStream(lexer);
-  tokenStream.fill();
 
   // 構文解析
   const parser = new FormulaParser(tokenStream);
