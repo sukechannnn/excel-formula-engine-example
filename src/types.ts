@@ -36,19 +36,19 @@ export enum TokenType {
 
 // RPNトークン
 export interface RPNToken {
-  type: TokenType;
-  value?: unknown;
-  argCount?: number; // 関数の引数数
-  offset?: number; // ジャンプ命令のオフセット
+  type: TokenType
+  value?: unknown
+  argCount?: number // 関数の引数数
+  offset?: number // ジャンプ命令のオフセット
 }
 
 // 中間表現（IR）
 export interface IntermediateRepresentation {
-  tokens: RPNToken[];
-  dependencies: string[];
+  tokens: RPNToken[]
+  dependencies: string[]
 }
 
 // 評価コンテキスト
 export interface EvaluationContext {
-  dependencies: Map<string, unknown>;
+  dependencies: Map<string, unknown>
 }
