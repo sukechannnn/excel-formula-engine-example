@@ -6,14 +6,16 @@ import { StackVM } from "./StackVM";
 import { EvaluationContext } from "./types";
 
 export function evaluate(formula: string, cellValues: Map<string, unknown>): unknown {
-  // 入力ストリームを作成
+  // lexer 用の入力ストリーム (数式文字列 を 1 文字ずつ読み取れるようにしたもの) を用意
   const inputStream = new CharStream(formula);
+
+  // 字句解析: 文字 → 記号（トークン）の並び
   const lexer = new FormulaLexer(inputStream);
 
-  // トークンストリームを作成
+  // parser 用のトークンストリーム (Lexer が生成したトークンを順番に並べて保持する) を用意
   const tokenStream = new CommonTokenStream(lexer);
 
-  // 構文解析
+  // 構文解析: トークン列 → 構文解析木
   const parser = new FormulaParser(tokenStream);
   const tree = parser.formula();
 

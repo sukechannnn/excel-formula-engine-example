@@ -31,6 +31,7 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
     };
   }
 
+  // 以下に実装してある visitXxx の処理に委譲する
   visitFormula = (ctx: FormulaContext): void => {
     const expr = ctx.expr();
     if (expr) {
@@ -38,6 +39,8 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
     }
   };
 
+  // Formula.g4 で定義した文法ルール expr に対応するノードを訪問したときに呼ばれる
+  // 引数 ctx にはその expr ノードの情報が入っている
   visitExpr = (ctx: ExprContext): void => {
     const additiveExprs = ctx.additiveExpr_list();
 
@@ -45,7 +48,7 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
       // 比較演算子なし
       this.visit(additiveExprs[0]);
     } else if (additiveExprs.length === 2) {
-      // 比較演算子あり
+      // 比較演算子ありの場合は左右の式を先に評価
       this.visit(additiveExprs[0]);
       this.visit(additiveExprs[1]);
 
@@ -65,6 +68,8 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
     }
   };
 
+  // Formula.g4 で定義した文法ルール additiveExpr に対応するノードを訪問したときに呼ばれる
+  // 引数 ctx にはその additiveExpr ノードの情報が入っている
   visitAdditiveExpr = (ctx: AdditiveExprContext): void => {
     // ANTLR4の左再帰処理
     const additiveExpr = ctx.additiveExpr();
@@ -88,6 +93,8 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
     }
   };
 
+  // Formula.g4 で定義した文法ルール multiplicativeExpr に対応するノードを訪問したときに呼ばれる
+  // 引数 ctx にはその multiplicativeExpr ノードの情報が入っている（以下同様）
   visitMultiplicativeExpr = (ctx: MultiplicativeExprContext): void => {
     // ANTLR4の左再帰処理
     const multiplicativeExpr = ctx.multiplicativeExpr();
@@ -128,6 +135,7 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
     }
   };
 
+  // visitPrimaryExpr は無くても動く（自動的に移譲される）が、分かりやすさのために記述している
   visitPrimaryExpr = (ctx: PrimaryExprContext): void => {
     // IF関数
     const ifFunction = ctx.ifFunction();
@@ -179,6 +187,27 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
     this.tokens.push({ type: TokenType.NUMBER, value });
   };
 
+  visitSumFunction = (ctx: SumFunctionContext): void => {
+    const exprs = ctx.expr_list();
+
+    if (exprs && exprs.length > 0) {
+      // 各引数を評価
+      for (const expr of exprs) {
+        this.visit(expr);
+      }
+
+      // SUM関数呼び出し（引数の数を記録）
+      this.tokens.push({
+        type: TokenType.FUNCTION_CALL,
+        value: "SUM",
+        argCount: exprs.length,
+      });
+    } else {
+      // 引数なしの場合は0を返す
+      this.tokens.push({ type: TokenType.NUMBER, value: 0 });
+    }
+  };
+
   visitIfFunction = (ctx: IfFunctionContext): void => {
     const exprs = ctx.expr_list();
     if (!exprs || exprs.length === 0) return;
@@ -212,26 +241,5 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
     // ジャンプオフセットを更新
     this.tokens[jumpToElseIndex].offset = elseStartIndex - jumpToElseIndex - 1;
     this.tokens[jumpToEndIndex].offset = this.tokens.length - jumpToEndIndex - 1;
-  };
-
-  visitSumFunction = (ctx: SumFunctionContext): void => {
-    const exprs = ctx.expr_list();
-
-    if (exprs && exprs.length > 0) {
-      // 各引数を評価
-      for (const expr of exprs) {
-        this.visit(expr);
-      }
-
-      // SUM関数呼び出し（引数の数を記録）
-      this.tokens.push({
-        type: TokenType.FUNCTION_CALL,
-        value: "SUM",
-        argCount: exprs.length,
-      });
-    } else {
-      // 引数なしの場合は0を返す
-      this.tokens.push({ type: TokenType.NUMBER, value: 0 });
-    }
   };
 }
