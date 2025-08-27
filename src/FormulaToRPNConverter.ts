@@ -231,7 +231,8 @@ export class FormulaToRPNConverter extends FormulaVisitor<void> {
     // elseブランチの開始位置
     const elseStartIndex = this.tokens.length
 
-    // elseブランチ（省略可能）
+    // elseブランチ（IFの第３引数は省略可能）
+    // 第3引数がなければ、デフォルト値として false をプッシュ
     if (exprs.length > 2 && exprs[2]) {
       this.visit(exprs[2])
     } else {
