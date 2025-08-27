@@ -5,6 +5,19 @@ Excelの数式エンジンの実装例です。四則演算、比較演算、SUM
 
 実際に計算している様子は、テストコード src/FormulaEngine.spec.ts をご確認ください。
 
+## 環境構築
+
+MacOS の場合の環境構築方法です。
+
+```
+# 予め antlr のインストールが必要
+$ brew install antlr
+
+$ npm ci
+
+$ npm run test
+```
+
 ## 機能
 
 - **四則演算**: `+`, `-`, `*`, `/`
@@ -86,46 +99,3 @@ const cellValues = new Map([
 const result = evaluateFormula('=A1+B1*2', cellValues);
 console.log(result); // 16
 ```
-
-## セットアップ
-
-```bash
-# 依存関係のインストール
-npm install
-
-# テストの実行
-npm test
-
-# TypeScriptのビルド
-npm run build
-```
-
-## 開発
-
-```bash
-# 開発モード（型チェックなし）
-npm run dev
-
-# ファイル監視モード
-npm run watch
-
-# テスト監視モード
-npm run test:watch
-
-# カバレッジレポート
-npm run test:coverage
-```
-
-## テスト
-
-3つのテストファイルで機能を検証：
-
-- `src/index.spec.ts` - 統合テスト
-- `src/FormulaToRPNConverter.spec.ts` - RPN変換のテスト
-- `src/StackVM.spec.ts` - スタックマシンのテスト
-
-## 制限事項
-
-- 範囲参照（`A1:B5`）は未対応
-- 文字列リテラルは未対応
-- サポートする関数は`SUM`と`IF`のみ
